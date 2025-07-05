@@ -72,6 +72,16 @@ export default {
         "88": "22rem",
         "128": "32rem",
       },
+      gap: {
+        "1": "0.25rem",
+        "2": "0.5rem",
+        "3": "0.75rem",
+        "4": "1rem",
+        "6": "1.5rem",
+        "8": "2rem",
+        "12": "3rem",
+        "16": "4rem",
+      },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
@@ -94,4 +104,14 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  safelist: [
+    "gap-1",
+    "gap-2",
+    "gap-3",
+    "gap-4",
+    "gap-6",
+    "gap-8",
+    "gap-12",
+    "gap-16",
+  ],
 } satisfies Config;

@@ -43,7 +43,7 @@ export default function Home() {
     >
       <FlexContainer
         direction="col"
-        gap="16"
+        gap="8"
         className="flex-1 max-w-7xl p-5"
         align="center"
       >
@@ -66,34 +66,31 @@ export default function Home() {
             </Button>
           )}
         </div>
-
-        <main className="flex-1">
-          <FlexContainer direction="col" gap="6" className="px-4">
-            <CardGrid>
-              <div className="text-center p-6 rounded-lg border">
-                <RefreshCw className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">Real-time Sync</h3>
-                <p className="text-sm text-muted-foreground">
-                  Changes appear instantly across all your devices
-                </p>
-              </div>
-              <div className="text-center p-6 rounded-lg border">
-                <FolderOpen className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">Organize Tasks</h3>
-                <p className="text-sm text-muted-foreground">
-                  Create multiple lists and organize tasks by project
-                </p>
-              </div>
-              <div className="text-center p-6 rounded-lg border">
-                <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">Track Progress</h3>
-                <p className="text-sm text-muted-foreground">
-                  Monitor completion status and track your productivity
-                </p>
-              </div>
-            </CardGrid>
-          </FlexContainer>
-        </main>
+        <FlexContainer direction="col" gap="6" className="px-4">
+          <CardGrid>
+            <div className="text-center p-6 rounded-lg border">
+              <RefreshCw className="h-8 w-8 text-primary mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Real-time Sync</h3>
+              <p className="text-sm text-muted-foreground">
+                Changes appear instantly across all your devices
+              </p>
+            </div>
+            <div className="text-center p-6 rounded-lg border">
+              <FolderOpen className="h-8 w-8 text-primary mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Organize Tasks</h3>
+              <p className="text-sm text-muted-foreground">
+                Create multiple lists and organize tasks by project
+              </p>
+            </div>
+            <div className="text-center p-6 rounded-lg border">
+              <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Track Progress</h3>
+              <p className="text-sm text-muted-foreground">
+                Monitor completion status and track your productivity
+              </p>
+            </div>
+          </CardGrid>
+        </FlexContainer>
       </FlexContainer>
     </FlexContainer>
   );
