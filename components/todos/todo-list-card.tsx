@@ -35,7 +35,7 @@ export function TodoListCard({
       await onUpdate(todoList.id, editName);
       setIsEditing(false);
     } catch (error) {
-      console.error("Failed to update todo list:", error);
+      console.error("Failed to update to-do list:", error);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +46,7 @@ export function TodoListCard({
     try {
       await onDelete(todoList.id);
     } catch (error) {
-      console.error("Failed to delete todo list:", error);
+      console.error("Failed to delete to-do list:", error);
     } finally {
       setIsLoading(false);
     }

@@ -39,8 +39,20 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/todo");
+
+      // Wait for the session to be established
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        console.log("Session established, redirecting to /todo");
+        router.push("/todo");
+      } else {
+        console.log("No session found after login");
+        setError(
+          "Login successful but session not established. Please try again."
+        );
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {

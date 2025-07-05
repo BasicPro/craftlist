@@ -35,7 +35,7 @@ export function CreateTodoItem({ listId, onCreate }: CreateTodoItemProps) {
       setDescription("");
       setIsCreating(false);
     } catch (error) {
-      console.error("Failed to create todo item:", error);
+      console.error("Failed to create to-do item:", error);
     } finally {
       setIsLoading(false);
     }

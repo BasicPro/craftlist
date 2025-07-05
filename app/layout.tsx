@@ -12,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "CraftList - Organize Your Tasks",
-  description: "A real-time todo app built with Next.js and Supabase",
+  description: "A real-time to-do app built with Next.js and Supabase",
 };
 
 const geistSans = Geist({

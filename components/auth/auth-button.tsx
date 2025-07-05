@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User } from "@/lib/supabase/types";
+import { UserAccountDropdown } from "./user-account-dropdown";
 
 interface AuthButtonProps {
   user: User | null;
@@ -29,19 +30,7 @@ export function AuthButton({ user }: AuthButtonProps) {
   };
 
   if (user) {
-    return (
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground">Hi, {user.email}!</span>
-        <Button
-          onClick={handleSignOut}
-          disabled={isLoading}
-          variant="outline"
-          size="sm"
-        >
-          {isLoading ? "Loading..." : "Sign Out"}
-        </Button>
-      </div>
-    );
+    return <UserAccountDropdown user={user} />;
   }
 
   return (

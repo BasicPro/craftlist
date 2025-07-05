@@ -24,7 +24,7 @@ export function CreateTodoList({ onCreate }: CreateTodoListProps) {
       setName("");
       setIsCreating(false);
     } catch (error) {
-      console.error("Failed to create todo list:", error);
+      console.error("Failed to create to-do list:", error);
     } finally {
       setIsLoading(false);
     }

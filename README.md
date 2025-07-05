@@ -1,6 +1,6 @@
 # ![CraftList](app/logo.svg) CraftList - Real-time Todo App
 
-A modern, real-time todo list application built with Next.js and Supabase. Create, manage, and organize your tasks with instant updates across all devices.
+A modern, real-time to-do list application built with Next.js and Supabase. Create, manage, and organize your tasks with instant updates across all devices.
 
 ## ✨ Features
 
@@ -10,7 +10,7 @@ A modern, real-time todo list application built with Next.js and Supabase. Creat
 - **CRUD Operations**: Create, read, update, and delete both lists and items
 - **Modern UI**: Clean, responsive design built with Tailwind CSS and shadcn/ui
 - **Real-time Subscriptions**: Live updates using Supabase's real-time features
-- **User-specific Data**: Each user sees only their own todo lists and items
+- **User-specific Data**: Each user sees only their own to-do lists and items
 - **Optimistic Updates**: Instant UI feedback for better user experience
 
 ## 🚀 Live Demo
@@ -77,26 +77,28 @@ cd craftlist
 2. Go to your project's SQL Editor and run the following schema:
 
 ```sql
--- Create todo_lists table
-CREATE TABLE todo_lists (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  name TEXT NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.todo_items (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  status USER-DEFINED NOT NULL DEFAULT 'pending'::status,
+  name text NOT NULL,
+  description text,
+  list_id uuid NOT NULL DEFAULT gen_random_uuid(),
+  CONSTRAINT todo_items_pkey PRIMARY KEY (id),
+  CONSTRAINT todo_items_list_id_fkey FOREIGN KEY (list_id) REFERENCES public.todo_lists(id)
 );
 
--- Create todo_items table
-CREATE TABLE todo_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  list_id UUID REFERENCES todo_lists(id) ON DELETE CASCADE NOT NULL,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  name TEXT NOT NULL,
-  description TEXT,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+
+CREATE TABLE public.todo_lists (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  user_id uuid NOT NULL DEFAULT auth.uid(),
+  name text NOT NULL,
+  CONSTRAINT todo_lists_pkey PRIMARY KEY (id)
 );
 
 -- Enable Row Level Security
@@ -104,30 +106,30 @@ ALTER TABLE todo_lists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE todo_items ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for todo_lists
-CREATE POLICY "Users can view their own todo lists" ON todo_lists
-  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can view their own to-do lists" ON todo_lists
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own todo lists" ON todo_lists
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own to-do lists" ON todo_lists
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own todo lists" ON todo_lists
-  FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own to-do lists" ON todo_lists
+  FOR UPDATE TO authenticated USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete their own todo lists" ON todo_lists
-  FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own to-do lists" ON todo_lists
+  FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 -- Create policies for todo_items
-CREATE POLICY "Users can view their own todo items" ON todo_items
-  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can view their own to-do items" ON todo_items
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own todo items" ON todo_items
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own to-do items" ON todo_items
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own todo items" ON todo_items
-  FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own to-do items" ON todo_items
+  FOR UPDATE TO authenticated USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete their own todo items" ON todo_items
-  FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own to-do items" ON todo_items
+  FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 -- Enable real-time for both tables
 ALTER PUBLICATION supabase_realtime ADD TABLE todo_lists;
@@ -173,7 +175,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 1. **Sign Up/Login**: Create an account or sign in with your existing credentials
 2. **Create Your First List**: Click "Create New List" to start organizing your tasks
-3. **Add Todo Items**: Within each list, add individual todo items with descriptions
+3. **Add Todo Items**: Within each list, add individual to-do items with descriptions
 4. **Track Progress**: Update item status (pending, in progress, completed)
 5. **Real-time Sync**: All changes appear instantly across your devices
 
@@ -207,7 +209,7 @@ craftlist/
 ├── app/                    # Next.js App Router pages
 │   ├── auth/              # Authentication pages
 │   ├── protected/         # Protected routes
-│   ├── todo/              # Todo list pages
+│   ├── to-do/              # Todo list pages
 │   └── layout.tsx         # Root layout
 ├── components/            # React components
 │   ├── todos/            # Todo-specific components

@@ -55,7 +55,7 @@ export function TodoItemComponent({ item, onUpdate, onDelete }: TodoItemProps) {
       });
       setIsEditing(false);
     } catch (error) {
-      console.error("Failed to update todo item:", error);
+      console.error("Failed to update to-do item:", error);
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +66,7 @@ export function TodoItemComponent({ item, onUpdate, onDelete }: TodoItemProps) {
     try {
       await onDelete(item.id);
     } catch (error) {
-      console.error("Failed to delete todo item:", error);
+      console.error("Failed to delete to-do item:", error);
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +77,7 @@ export function TodoItemComponent({ item, onUpdate, onDelete }: TodoItemProps) {
     try {
       await onUpdate(item.id, { status });
     } catch (error) {
-      console.error("Failed to update todo item status:", error);
+      console.error("Failed to update to-do item status:", error);
     } finally {
       setIsLoading(false);
     }

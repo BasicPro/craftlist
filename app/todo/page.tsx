@@ -13,6 +13,14 @@ import {
 } from "@/lib/supabase/database";
 import { realtimeManager } from "@/lib/supabase/realtime";
 import { useRouter } from "next/navigation";
+import {
+  PageContainer,
+  PageHeader,
+  LoadingContainer,
+  ErrorContainer,
+  CardGrid,
+  EmptyState,
+} from "@/components/ui/layout";
 
 export default function TodoListsPage() {
   const [todoLists, setTodoLists] = useState<TodoList[]>([]);
@@ -35,7 +43,7 @@ export default function TodoListsPage() {
       }
       setTodoItems(itemsMap);
     } catch (error) {
-      console.error("Failed to load todo lists:", error);
+      console.error("Failed to load to-do lists:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -43,7 +51,7 @@ export default function TodoListsPage() {
         router.push("/auth/login");
         return;
       }
-      setError("Failed to load todo lists. Please try again.");
+      setError("Failed to load to-do lists. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +86,7 @@ export default function TodoListsPage() {
       setError(null);
       await createTodoList({ name });
     } catch (error) {
-      console.error("Failed to create todo list:", error);
+      console.error("Failed to create to-do list:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -95,7 +103,7 @@ export default function TodoListsPage() {
       setError(null);
       await updateTodoList(id, { name });
     } catch (error) {
-      console.error("Failed to update todo list:", error);
+      console.error("Failed to update to-do list:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -112,7 +120,7 @@ export default function TodoListsPage() {
       setError(null);
       await deleteTodoList(id);
     } catch (error) {
-      console.error("Failed to delete todo list:", error);
+      console.error("Failed to delete to-do list:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -130,33 +138,24 @@ export default function TodoListsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
+      <PageContainer>
+        <LoadingContainer />
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">My Todo Lists</h1>
-          <p className="text-muted-foreground">
-            Create and manage your todo lists
-          </p>
-        </div>
+    <PageContainer>
+      <PageHeader
+        title="My Todo Lists"
+        description="Create and manage your to-do lists"
+      >
         <CreateTodoList onCreate={handleCreateList} />
-      </div>
+      </PageHeader>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
+      {error && <ErrorContainer message={error} onRetry={loadTodoLists} />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <CardGrid>
         {todoLists.map((list) => (
           <TodoListCard
             key={list.id}
@@ -167,16 +166,14 @@ export default function TodoListsPage() {
             onClick={() => handleListClick(list.id)}
           />
         ))}
-      </div>
+      </CardGrid>
 
       {todoLists.length === 0 && !error && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">No todo lists yet</p>
-          <p className="text-sm text-muted-foreground">
-            Create your first todo list to get started!
-          </p>
-        </div>
+        <EmptyState
+          title="No to-do lists yet"
+          description="Create your first to-do list to get started!"
+        />
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -2,11 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { InfoIcon } from "lucide-react";
 import { User } from "@/lib/supabase/types";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowLeft, User as UserIcon, Mail, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  PageContainer,
+  PageHeader,
+  LoadingContainer,
+} from "@/components/ui/layout";
 
-export default function ProtectedPage() {
+export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -16,44 +29,87 @@ export default function ProtectedPage() {
     const getUser = async () => {
       const {
         data: { user },
-        error,
       } = await supabase.auth.getUser();
-      if (error || !user) {
-        router.push("/auth/login");
-        return;
-      }
       setUser(user);
       setIsLoading(false);
     };
 
     getUser();
-  }, [router, supabase.auth]);
+  }, [supabase.auth]);
 
   if (isLoading) {
     return (
-      <div className="flex-1 w-full flex flex-col gap-12">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
+      <PageContainer>
+        <LoadingContainer />
+      </PageContainer>
     );
   }
 
+  if (!user) {
+    router.push("/auth/login");
+    return null;
+  }
+
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
-        </div>
+    <PageContainer>
+      <div className="mb-8">
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/todo")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Todos
+        </Button>
+
+        <PageHeader
+          title="Profile"
+          description="Manage your account settings and preferences"
+        />
       </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(user, null, 2)}
-        </pre>
+
+      <div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserIcon className="h-5 w-5" />
+              Account Information
+            </CardTitle>
+            <CardDescription>
+              Your account details and preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg border">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Email</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-lg border">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Member since</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : "Unknown"}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <p className="text-sm text-muted-foreground">
+                More profile features coming soon! You'll be able to update your
+                preferences, change your password, and manage your account
+                settings.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -19,7 +19,7 @@ class RealtimeManager {
     (payload: RealtimePostgresChangesPayload<TodoItem>) => void
   >();
 
-  // Subscribe to todo lists changes
+  // Subscribe to to-do lists changes
   subscribeToTodoLists(
     callback: (payload: RealtimePostgresChangesPayload<TodoList>) => void
   ) {
@@ -51,7 +51,7 @@ class RealtimeManager {
     return () => this.todoListListeners.delete(callback);
   }
 
-  // Subscribe to todo items changes for a specific list
+  // Subscribe to to-do items changes for a specific list
   subscribeToTodoItems(
     listId: string,
     callback: (payload: RealtimePostgresChangesPayload<TodoItem>) => void
@@ -100,7 +100,7 @@ class RealtimeManager {
     };
   }
 
-  // Subscribe to todo items changes globally
+  // Subscribe to to-do items changes globally
   subscribeToAllTodoItems(
     callback: (payload: RealtimePostgresChangesPayload<TodoItem>) => void
   ) {

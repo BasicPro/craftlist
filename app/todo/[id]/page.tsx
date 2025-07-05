@@ -15,6 +15,13 @@ import { realtimeManager } from "@/lib/supabase/realtime";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  PageContainer,
+  PageHeader,
+  LoadingContainer,
+  ErrorContainer,
+  EmptyState,
+} from "@/components/ui/layout";
 
 interface TodoListPageProps {
   params: Promise<{
@@ -41,7 +48,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       }
       setTodoList(list);
     } catch (error) {
-      console.error("Failed to load todo list:", error);
+      console.error("Failed to load to-do list:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -59,7 +66,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       const items = await getTodoItems(id);
       setTodoItems(items);
     } catch (error) {
-      console.error("Failed to load todo items:", error);
+      console.error("Failed to load to-do items:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -67,7 +74,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
         router.push("/auth/login");
         return;
       }
-      setError("Failed to load todo items. Please try again.");
+      setError("Failed to load to-do items. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +129,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       setError(null);
       await createTodoItem(data);
     } catch (error) {
-      console.error("Failed to create todo item:", error);
+      console.error("Failed to create to-do item:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -142,7 +149,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       setError(null);
       await updateTodoItem(id, data);
     } catch (error) {
-      console.error("Failed to update todo item:", error);
+      console.error("Failed to update to-do item:", error);
       if (
         error instanceof Error &&
         error.message === "User not authenticated"
@@ -169,7 +176,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       // The real-time subscription should handle the update, but we can also reload if needed
       console.log("Item deleted successfully:", itemId);
     } catch (error) {
-      console.error("Failed to delete todo item:", error);
+      console.error("Failed to delete to-do item:", error);
 
       // Revert optimistic update on error
       await loadTodoItems();
@@ -187,24 +194,22 @@ export default function TodoListPage({ params }: TodoListPageProps) {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
+      <PageContainer>
+        <LoadingContainer />
+      </PageContainer>
     );
   }
 
   if (!todoList) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer>
         <div className="text-center">
           <p className="text-lg">Todo list not found</p>
           <Button onClick={() => router.push("/todo")} className="mt-4">
             Back to Lists
           </Button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -214,7 +219,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
   const totalCount = todoItems.length;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <PageContainer>
       <div className="mb-8">
         <Button
           variant="ghost"
@@ -225,21 +230,13 @@ export default function TodoListPage({ params }: TodoListPageProps) {
           Back to Lists
         </Button>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{todoList.name}</h1>
-            <p className="text-muted-foreground">
-              {completedCount} of {totalCount} items completed
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title={todoList.name}
+          description={`${completedCount} of ${totalCount} items completed`}
+        />
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
+      {error && <ErrorContainer message={error} onRetry={loadTodoItems} />}
 
       <div className="space-y-4">
         <CreateTodoItem listId={id} onCreate={handleCreateItem} />
@@ -255,13 +252,11 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       </div>
 
       {todoItems.length === 0 && !error && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">No todo items yet</p>
-          <p className="text-sm text-muted-foreground">
-            Add your first todo item to get started!
-          </p>
-        </div>
+        <EmptyState
+          title="No to-do items yet"
+          description="Add your first to-do item to get started!"
+        />
       )}
-    </div>
+    </PageContainer>
   );
 }

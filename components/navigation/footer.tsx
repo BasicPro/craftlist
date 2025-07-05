@@ -3,7 +3,7 @@ import { CheckSquare } from "lucide-react";
 export function Footer() {
   return (
     <footer className="w-full border-t border-t-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto p-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Brand Section */}
           <div className="flex items-center gap-4">
