@@ -35,51 +35,57 @@ export function CreateTodoList({ onCreate }: CreateTodoListProps) {
     setIsCreating(false);
   };
 
-  if (!isCreating) {
-    return (
+  return (
+    <div className="relative">
       <Button
         variant="outline"
-        className="w-full h-32 border-dashed border-2 hover:border-solid"
+        size="sm"
+        className="whitespace-nowrap"
         onClick={() => setIsCreating(true)}
       >
-        <Plus className="h-6 w-6 mr-2" />
-        Create New List
+        <Plus className="h-4 w-4 mr-2" />
+        Create List
       </Button>
-    );
-  }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Create New Todo List</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <Input
-            placeholder="Enter list name..."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleCreate();
-              if (e.key === "Escape") handleCancel();
-            }}
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <Button onClick={handleCreate} disabled={isLoading || !name.trim()}>
-              Create List
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isLoading}
-            >
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-          </div>
+      {isCreating && (
+        <div className="absolute top-full right-0 mt-2 z-50 w-80">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Create New Todo List</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Input
+                  placeholder="Enter list name..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreate();
+                    if (e.key === "Escape") handleCancel();
+                  }}
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleCreate}
+                    disabled={isLoading || !name.trim()}
+                  >
+                    Create List
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

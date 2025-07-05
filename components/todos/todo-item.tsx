@@ -147,7 +147,7 @@ export function TodoItemComponent({ item, onUpdate, onDelete }: TodoItemProps) {
               checked={item.status === "completed"}
               onCheckedChange={handleCheckboxChange}
               disabled={isLoading}
-              className="mt-1"
+              className=""
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">

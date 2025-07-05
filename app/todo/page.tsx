@@ -140,11 +140,14 @@ export default function TodoListsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Todo Lists</h1>
-        <p className="text-muted-foreground">
-          Create and manage your todo lists
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">My Todo Lists</h1>
+          <p className="text-muted-foreground">
+            Create and manage your todo lists
+          </p>
+        </div>
+        <CreateTodoList onCreate={handleCreateList} />
       </div>
 
       {error && (
@@ -154,8 +157,6 @@ export default function TodoListsPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <CreateTodoList onCreate={handleCreateList} />
-
         {todoLists.map((list) => (
           <TodoListCard
             key={list.id}

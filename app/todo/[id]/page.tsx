@@ -89,9 +89,19 @@ export default function TodoListPage({ params }: TodoListPageProps) {
     const unsubscribeLists = realtimeManager.subscribeToTodoLists(
       async (payload) => {
         console.log("Todo list change received:", payload);
-        if (payload.eventType === "DELETE") {
+        console.log("Current list ID:", id);
+        console.log("Payload new record:", payload.new);
+        console.log("Payload old record:", payload.old);
+
+        if (
+          payload.eventType === "DELETE" &&
+          payload.old &&
+          payload.old.id === id
+        ) {
+          console.log("Current list deleted, redirecting to lists page");
           router.push("/todo");
         } else {
+          console.log("Updating current list:", payload.new);
           await loadTodoList();
         }
       }

@@ -1,8 +1,6 @@
-# CraftList - Real-time Todo App
+# ![CraftList](app/logo.svg) CraftList - Real-time Todo App
 
 A modern, real-time todo list application built with Next.js and Supabase. Create, manage, and organize your tasks with instant updates across all devices.
-
-![CraftList App](app/logo.svg)
 
 ## ✨ Features
 
