@@ -24,12 +24,7 @@ export function AuthButton({ user }: AuthButtonProps) {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+    router.push("/auth/login");
     setIsLoading(false);
   };
 

@@ -8,7 +8,7 @@ import {
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div className="flex w-full items-center justify-center p-6 md:p-10 min-h-[calc(100vh-64px-100px)]">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
           <Card>
