@@ -1,105 +1,279 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# CraftList - Real-time Todo App
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A modern, real-time todo list application built with Next.js and Supabase. Create, manage, and organize your tasks with instant updates across all devices.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+![CraftList App](app/opengraph-image.png)
 
-## Features
+## ✨ Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **Real-time Updates**: Changes sync instantly across all connected devices
+- **User Authentication**: Secure sign-up and login with Supabase Auth
+- **Todo Lists & Items**: Organize tasks into multiple lists with individual items
+- **CRUD Operations**: Create, read, update, and delete both lists and items
+- **Modern UI**: Clean, responsive design built with Tailwind CSS and shadcn/ui
+- **Real-time Subscriptions**: Live updates using Supabase's real-time features
+- **User-specific Data**: Each user sees only their own todo lists and items
+- **Optimistic Updates**: Instant UI feedback for better user experience
 
-## Demo
+## 🚀 Live Demo
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+[View the live demo here](https://your-demo-url.vercel.app)
 
-## Deploy to Vercel
+## 🛠️ Tech Stack
 
-Vercel deployment will guide you through creating a Supabase account and project.
+- **Frontend**: Next.js 14 with App Router
+- **Backend**: Supabase (PostgreSQL + Real-time + Auth)
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Authentication**: Supabase Auth with cookie-based sessions
+- **Real-time**: Supabase Realtime subscriptions
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+## 📋 Database Schema
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### Todo Lists Table
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+```sql
+todo_lists (
+  id: uuid (primary key)
+  user_id: uuid (foreign key to auth.users)
+  name: text
+  description: text
+  created_at: timestamp
+  updated_at: timestamp
+)
+```
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### Todo Items Table
 
-## Clone and run locally
+```sql
+todo_items (
+  id: uuid (primary key)
+  list_id: uuid (foreign key to todo_lists)
+  user_id: uuid (foreign key to auth.users)
+  name: text
+  description: text
+  status: text (enum: 'pending', 'in_progress', 'completed')
+  created_at: timestamp
+  updated_at: timestamp
+)
+```
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+## 🚀 Quick Start
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### Prerequisites
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+- Node.js 18+
+- npm, yarn, or pnpm
+- Supabase account
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+### 1. Clone the Repository
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+```bash
+git clone https://github.com/yourusername/craftlist.git
+cd craftlist
+```
 
-3. Use `cd` to change into the app's directory
+### 2. Set Up Supabase Project
 
-   ```bash
-   cd with-supabase-app
-   ```
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to your project's SQL Editor and run the following schema:
 
-4. Rename `.env.example` to `.env.local` and update the following:
+```sql
+-- Create todo_lists table
+CREATE TABLE todo_lists (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+-- Create todo_items table
+CREATE TABLE todo_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  list_id UUID REFERENCES todo_lists(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+-- Enable Row Level Security
+ALTER TABLE todo_lists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE todo_items ENABLE ROW LEVEL SECURITY;
 
-5. You can now run the Next.js local development server:
+-- Create policies for todo_lists
+CREATE POLICY "Users can view their own todo lists" ON todo_lists
+  FOR SELECT USING (auth.uid() = user_id);
 
-   ```bash
-   npm run dev
-   ```
+CREATE POLICY "Users can insert their own todo lists" ON todo_lists
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+CREATE POLICY "Users can update their own todo lists" ON todo_lists
+  FOR UPDATE USING (auth.uid() = user_id);
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+CREATE POLICY "Users can delete their own todo lists" ON todo_lists
+  FOR DELETE USING (auth.uid() = user_id);
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+-- Create policies for todo_items
+CREATE POLICY "Users can view their own todo items" ON todo_items
+  FOR SELECT USING (auth.uid() = user_id);
 
-## Feedback and issues
+CREATE POLICY "Users can insert their own todo items" ON todo_items
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+CREATE POLICY "Users can update their own todo items" ON todo_items
+  FOR UPDATE USING (auth.uid() = user_id);
 
-## More Supabase examples
+CREATE POLICY "Users can delete their own todo items" ON todo_items
+  FOR DELETE USING (auth.uid() = user_id);
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+-- Enable real-time for both tables
+ALTER PUBLICATION supabase_realtime ADD TABLE todo_lists;
+ALTER PUBLICATION supabase_realtime ADD TABLE todo_items;
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+You can find these values in your Supabase project settings under API.
+
+### 4. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 5. Run the Development Server
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## 📱 How to Use
+
+### Getting Started
+
+1. **Sign Up/Login**: Create an account or sign in with your existing credentials
+2. **Create Your First List**: Click "Create New List" to start organizing your tasks
+3. **Add Todo Items**: Within each list, add individual todo items with descriptions
+4. **Track Progress**: Update item status (pending, in progress, completed)
+5. **Real-time Sync**: All changes appear instantly across your devices
+
+### Features Overview
+
+#### Todo Lists
+
+- Create multiple lists for different projects or categories
+- Edit list names and descriptions
+- Delete lists (removes all associated items)
+- View all your lists on the main dashboard
+
+#### Todo Items
+
+- Add items to any list with name and description
+- Update item status to track progress
+- Edit item details anytime
+- Delete individual items
+- Items are automatically filtered by user
+
+#### Real-time Features
+
+- Changes sync instantly across all connected devices
+- No need to refresh the page
+- Collaborative features (if multiple users share lists)
+
+## 🏗️ Project Structure
+
+```
+craftlist/
+├── app/                    # Next.js App Router pages
+│   ├── auth/              # Authentication pages
+│   ├── protected/         # Protected routes
+│   ├── todo/              # Todo list pages
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── todos/            # Todo-specific components
+│   ├── ui/               # shadcn/ui components
+│   └── auth/             # Authentication components
+├── lib/                  # Utility functions
+│   └── supabase/         # Supabase client configuration
+└── middleware.ts         # Next.js middleware for auth
+```
+
+## 🔧 Customization
+
+### Styling
+
+The app uses Tailwind CSS with shadcn/ui components. You can customize the theme by modifying:
+
+- `tailwind.config.ts` - Tailwind configuration
+- `app/globals.css` - Global styles
+- `components.json` - shadcn/ui configuration
+
+### Adding New Features
+
+- **New Todo Fields**: Add columns to the database schema and update TypeScript types
+- **Categories/Tags**: Extend the todo_items table with additional fields
+- **Due Dates**: Add timestamp fields for deadline tracking
+- **Priority Levels**: Add priority enum to todo_items
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fcraftlist)
+
+### Environment Variables for Production
+
+Make sure to set these in your deployment platform:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- Backend powered by [Supabase](https://supabase.com/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Styling with [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+Made with ❤️ for productive task management
