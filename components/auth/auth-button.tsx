@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,14 +13,6 @@ interface AuthButtonProps {
 export function AuthButton({ user }: AuthButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
-
-  const handleSignOut = async () => {
-    setIsLoading(true);
-    await supabase.auth.signOut();
-    router.refresh();
-    setIsLoading(false);
-  };
 
   const handleSignIn = async () => {
     setIsLoading(true);

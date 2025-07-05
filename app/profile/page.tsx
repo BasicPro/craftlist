@@ -102,8 +102,8 @@ export default function ProfilePage() {
 
             <div className="pt-4">
               <p className="text-sm text-muted-foreground">
-                More profile features coming soon! You'll be able to update your
-                preferences, change your password, and manage your account
+                More profile features coming soon! You&apos;ll be able to update
+                your preferences, change your password, and manage your account
                 settings.
               </p>
             </div>

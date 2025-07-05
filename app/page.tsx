@@ -5,7 +5,7 @@ import { CheckSquare, RefreshCw, FolderOpen, TrendingUp } from "lucide-react";
 import { hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FlexContainer, CardGrid } from "@/components/ui/layout";
 
 export default function Home() {
