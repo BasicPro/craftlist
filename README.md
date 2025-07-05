@@ -2,7 +2,7 @@
 
 A modern, real-time todo list application built with Next.js and Supabase. Create, manage, and organize your tasks with instant updates across all devices.
 
-![CraftList App](app/opengraph-image.png)
+![CraftList App](app/logo.svg)
 
 ## ✨ Features
 
@@ -17,7 +17,7 @@ A modern, real-time todo list application built with Next.js and Supabase. Creat
 
 ## 🚀 Live Demo
 
-[View the live demo here](https://your-demo-url.vercel.app)
+[View the live demo here](https://craftlist.vercel.app)
 
 ## 🛠️ Tech Stack
 

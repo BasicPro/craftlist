@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { User } from "@/lib/supabase/types";
 
 interface AuthButtonProps {
-  user: any;
+  user: User | null;
 }
 
 export function AuthButton({ user }: AuthButtonProps) {

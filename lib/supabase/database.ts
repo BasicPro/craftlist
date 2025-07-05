@@ -40,7 +40,6 @@ export async function createTodoList(
   data: CreateTodoListData
 ): Promise<TodoList> {
   const supabase = createClient();
-  const user = await getCurrentUser();
 
   const { data: newList, error } = await supabase
     .from("todo_lists")

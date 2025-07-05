@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { TodoList, TodoItem } from "@/lib/supabase/types";
 import { TodoListCard } from "@/components/todos/todo-list-card";
 import { CreateTodoList } from "@/components/todos/create-todo-list";
@@ -21,31 +21,7 @@ export default function TodoListsPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    loadTodoLists();
-
-    // Subscribe to real-time updates
-    const unsubscribeLists = realtimeManager.subscribeToTodoLists(
-      async (payload) => {
-        console.log("Todo lists change received:", payload);
-        await loadTodoLists();
-      }
-    );
-
-    const unsubscribeItems = realtimeManager.subscribeToAllTodoItems(
-      async (payload) => {
-        console.log("Todo items change received:", payload);
-        await loadTodoLists();
-      }
-    );
-
-    return () => {
-      unsubscribeLists();
-      unsubscribeItems();
-    };
-  }, []);
-
-  const loadTodoLists = async () => {
+  const loadTodoLists = useCallback(async () => {
     try {
       setError(null);
       const lists = await getTodoLists();
@@ -71,7 +47,31 @@ export default function TodoListsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    loadTodoLists();
+
+    // Subscribe to real-time updates
+    const unsubscribeLists = realtimeManager.subscribeToTodoLists(
+      async (payload) => {
+        console.log("Todo lists change received:", payload);
+        await loadTodoLists();
+      }
+    );
+
+    const unsubscribeItems = realtimeManager.subscribeToAllTodoItems(
+      async (payload) => {
+        console.log("Todo items change received:", payload);
+        await loadTodoLists();
+      }
+    );
+
+    return () => {
+      unsubscribeLists();
+      unsubscribeItems();
+    };
+  }, [loadTodoLists]);
 
   const handleCreateList = async (name: string) => {
     try {

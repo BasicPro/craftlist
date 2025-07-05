@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { TodoList, TodoItem } from "@/lib/supabase/types";
+import { useEffect, useState, use, useCallback } from "react";
+import { TodoList, TodoItem, TodoStatus } from "@/lib/supabase/types";
 import { TodoItemComponent } from "@/components/todos/todo-item";
 import { CreateTodoItem } from "@/components/todos/create-todo-item";
 import {
   createTodoItem,
   updateTodoItem,
   deleteTodoItem,
+  getTodoLists,
   getTodoItems,
 } from "@/lib/supabase/database";
-import { getTodoLists } from "@/lib/supabase/database";
 import { realtimeManager } from "@/lib/supabase/realtime";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface TodoListPageProps {
   params: Promise<{
@@ -29,6 +29,49 @@ export default function TodoListPage({ params }: TodoListPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const loadTodoList = useCallback(async () => {
+    try {
+      setError(null);
+      const lists = await getTodoLists();
+      const list = lists.find((l) => l.id === id);
+      if (!list) {
+        router.push("/todo");
+        return;
+      }
+      setTodoList(list);
+    } catch (error) {
+      console.error("Failed to load todo list:", error);
+      if (
+        error instanceof Error &&
+        error.message === "User not authenticated"
+      ) {
+        router.push("/auth/login");
+        return;
+      }
+      router.push("/todo");
+    }
+  }, [id, router]);
+
+  const loadTodoItems = useCallback(async () => {
+    try {
+      setError(null);
+      const items = await getTodoItems(id);
+      setTodoItems(items);
+    } catch (error) {
+      console.error("Failed to load todo items:", error);
+      if (
+        error instanceof Error &&
+        error.message === "User not authenticated"
+      ) {
+        router.push("/auth/login");
+        return;
+      }
+      setError("Failed to load todo items. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, router]);
 
   useEffect(() => {
     loadTodoList();
@@ -58,50 +101,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
       unsubscribeItems();
       unsubscribeLists();
     };
-  }, [id]);
-
-  const loadTodoList = async () => {
-    try {
-      setError(null);
-      const lists = await getTodoLists();
-      const list = lists.find((l) => l.id === id);
-      if (!list) {
-        router.push("/todo");
-        return;
-      }
-      setTodoList(list);
-    } catch (error) {
-      console.error("Failed to load todo list:", error);
-      if (
-        error instanceof Error &&
-        error.message === "User not authenticated"
-      ) {
-        router.push("/auth/login");
-        return;
-      }
-      router.push("/todo");
-    }
-  };
-
-  const loadTodoItems = async () => {
-    try {
-      setError(null);
-      const items = await getTodoItems(id);
-      setTodoItems(items);
-    } catch (error) {
-      console.error("Failed to load todo items:", error);
-      if (
-        error instanceof Error &&
-        error.message === "User not authenticated"
-      ) {
-        router.push("/auth/login");
-        return;
-      }
-      setError("Failed to load todo items. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [id, loadTodoList, loadTodoItems, router]);
 
   const handleCreateItem = async (data: {
     name: string;
@@ -126,7 +126,7 @@ export default function TodoListPage({ params }: TodoListPageProps) {
 
   const handleUpdateItem = async (
     id: string,
-    data: { name?: string; description?: string; status?: any }
+    data: { name?: string; description?: string; status?: TodoStatus }
   ) => {
     try {
       setError(null);

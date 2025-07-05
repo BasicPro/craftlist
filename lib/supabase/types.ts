@@ -36,3 +36,6 @@ export interface UpdateTodoItemData {
   description?: string;
   status?: TodoStatus;
 }
+
+// Re-export the official Supabase User type
+export type { User } from "@supabase/supabase-js";

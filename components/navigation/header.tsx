@@ -6,9 +6,10 @@ import { AuthButton } from "../auth/auth-button";
 import { ThemeSwitcher } from "../ui/theme-switcher";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { User } from "@/lib/supabase/types";
 
 export function Header() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
 

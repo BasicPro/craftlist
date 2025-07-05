@@ -1,12 +1,28 @@
 import { createClient } from "./client";
+import {
+  RealtimePostgresChangesPayload,
+  default as RealtimeChannel,
+} from "@supabase/realtime-js/dist/module/RealtimeChannel";
+import { TodoList, TodoItem } from "./types";
 
 class RealtimeManager {
   private supabase = createClient();
-  private channels = new Map<string, any>();
-  private listeners = new Map<string, Set<Function>>();
+  private channels = new Map<string, RealtimeChannel>();
+  private todoListListeners = new Set<
+    (payload: RealtimePostgresChangesPayload<TodoList>) => void
+  >();
+  private todoItemListeners = new Map<
+    string,
+    Set<(payload: RealtimePostgresChangesPayload<TodoItem>) => void>
+  >();
+  private allTodoItemListeners = new Set<
+    (payload: RealtimePostgresChangesPayload<TodoItem>) => void
+  >();
 
   // Subscribe to todo lists changes
-  subscribeToTodoLists(callback: (payload: any) => void) {
+  subscribeToTodoLists(
+    callback: (payload: RealtimePostgresChangesPayload<TodoList>) => void
+  ) {
     const channelName = "todo_lists_global";
 
     if (!this.channels.has(channelName)) {
@@ -19,24 +35,27 @@ class RealtimeManager {
             schema: "public",
             table: "todo_lists",
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<TodoList>) => {
             console.log("Todo lists change:", payload);
-            this.notifyListeners(channelName, payload);
+            this.todoListListeners.forEach((cb) => cb(payload));
           }
         )
         .subscribe((status) => {
           console.log("Todo lists subscription status:", status);
         });
 
-      this.channels.set(channelName, channel);
+      this.channels.set(channelName, channel as unknown as RealtimeChannel);
     }
 
-    this.addListener(channelName, callback);
-    return () => this.removeListener(channelName, callback);
+    this.todoListListeners.add(callback);
+    return () => this.todoListListeners.delete(callback);
   }
 
   // Subscribe to todo items changes for a specific list
-  subscribeToTodoItems(listId: string, callback: (payload: any) => void) {
+  subscribeToTodoItems(
+    listId: string,
+    callback: (payload: RealtimePostgresChangesPayload<TodoItem>) => void
+  ) {
     const channelName = `todo_items_${listId}`;
 
     if (!this.channels.has(channelName)) {
@@ -50,9 +69,10 @@ class RealtimeManager {
             table: "todo_items",
             filter: `list_id=eq.${listId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<TodoItem>) => {
             console.log(`Todo items change for list ${listId}:`, payload);
-            this.notifyListeners(channelName, payload);
+            const listeners = this.todoItemListeners.get(listId);
+            if (listeners) listeners.forEach((cb) => cb(payload));
           }
         )
         .subscribe((status) => {
@@ -62,15 +82,28 @@ class RealtimeManager {
           );
         });
 
-      this.channels.set(channelName, channel);
+      this.channels.set(channelName, channel as unknown as RealtimeChannel);
     }
 
-    this.addListener(channelName, callback);
-    return () => this.removeListener(channelName, callback);
+    if (!this.todoItemListeners.has(listId)) {
+      this.todoItemListeners.set(listId, new Set());
+    }
+    this.todoItemListeners.get(listId)!.add(callback);
+    return () => {
+      const listeners = this.todoItemListeners.get(listId);
+      if (listeners) {
+        listeners.delete(callback);
+        if (listeners.size === 0) {
+          this.todoItemListeners.delete(listId);
+        }
+      }
+    };
   }
 
   // Subscribe to todo items changes globally
-  subscribeToAllTodoItems(callback: (payload: any) => void) {
+  subscribeToAllTodoItems(
+    callback: (payload: RealtimePostgresChangesPayload<TodoItem>) => void
+  ) {
     const channelName = "todo_items_global";
 
     if (!this.channels.has(channelName)) {
@@ -83,51 +116,20 @@ class RealtimeManager {
             schema: "public",
             table: "todo_items",
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<TodoItem>) => {
             console.log("Todo items change:", payload);
-            this.notifyListeners(channelName, payload);
+            this.allTodoItemListeners.forEach((cb) => cb(payload));
           }
         )
         .subscribe((status) => {
           console.log("Todo items global subscription status:", status);
         });
 
-      this.channels.set(channelName, channel);
+      this.channels.set(channelName, channel as unknown as RealtimeChannel);
     }
 
-    this.addListener(channelName, callback);
-    return () => this.removeListener(channelName, callback);
-  }
-
-  private addListener(channelName: string, callback: Function) {
-    if (!this.listeners.has(channelName)) {
-      this.listeners.set(channelName, new Set());
-    }
-    this.listeners.get(channelName)!.add(callback);
-  }
-
-  private removeListener(channelName: string, callback: Function) {
-    const channelListeners = this.listeners.get(channelName);
-    if (channelListeners) {
-      channelListeners.delete(callback);
-
-      // If no more listeners for this channel, unsubscribe
-      if (channelListeners.size === 0) {
-        const channel = this.channels.get(channelName);
-        if (channel) {
-          this.supabase.removeChannel(channel);
-          this.channels.delete(channelName);
-        }
-        this.listeners.delete(channelName);
-      }
-    }
-  }
-
-  private notifyListeners(channelName: string, payload: any) {
-    const channelListeners = this.listeners.get(channelName);
-    if (channelListeners) {
-      channelListeners.forEach((callback) => callback(payload));
-    }
+    this.allTodoItemListeners.add(callback);
+    return () => this.allTodoItemListeners.delete(callback);
   }
 
   // Clean up all subscriptions
@@ -136,7 +138,9 @@ class RealtimeManager {
       this.supabase.removeChannel(channel);
     });
     this.channels.clear();
-    this.listeners.clear();
+    this.todoListListeners.clear();
+    this.todoItemListeners.clear();
+    this.allTodoItemListeners.clear();
   }
 }
 

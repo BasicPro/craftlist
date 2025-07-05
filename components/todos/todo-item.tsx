@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit2, Trash2, Check, X, ChevronDown } from "lucide-react";
+import { Edit2, Trash2, Check, X } from "lucide-react";
 import { TodoItem, TodoStatus } from "@/lib/supabase/types";
 
 interface TodoItemProps {
